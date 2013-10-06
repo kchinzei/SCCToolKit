@@ -1,0 +1,110 @@
+# ===================================================================================
+#
+#  SCCToolKit cmake configuration file for client projects
+#
+#             ** File generated automatically, do not modify **
+#
+#    In your CMakeLists.txt, add these lines:
+#
+#      FIND_PACKAGE(SCCToolKit REQUIRED )
+#      TARGET_LINK_LIBRARIES(MY_TARGET_NAME ${SCC_LIBS})   
+#
+#    This file will define the following variables:
+#      - SCC_LIBS          : The list of libraries to links against.
+#      - SCC_LIB_DIR       : The directory where lib files are. Calling LINK_DIRECTORIES
+#                                with this path is NOT needed. (This file does so for you)
+#      - SCC_INCLUDE_DIRS  : The SCCToolKit include directories.  Calling INCLUDE_DIRECTORIES
+#                                with this path is NOT needed. (This file does so for you)
+#      - SCC_VERSION       : The  version of this SCCToolKit build. Example: "1.2.0"
+#      - SCC_VERSION_MAJOR : Major version part of SCC_VERSION. Example: "1"
+#      - SCC_VERSION_MINOR : Minor version part of SCC_VERSION. Example: "2"
+#      - SCC_VERSION_PATCH : Patch version part of SCC_VERSION. Example: "0"
+#
+#
+#  Program:   Intelligent Surgical Instruments Project
+#  Module:    $HeadURL: $
+#  Language:  Cmake
+#  Date:      $Date: $
+#  Version:   $Revision: $
+#
+#  (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
+#  This work is supported by NEDO P10003 "Intelligent Surgical Instruments Project", Japan.
+#
+#  This file was edited from OpenCV (May 2010). 
+#  Thank you for the great software.
+# ===================================================================================
+
+
+# ======================================================
+# Include directories to add to the user project:
+# ======================================================
+SET(SCC_INCLUDE_DIRS @CMAKE_INCLUDE_DIRS_CONFIGCMAKE@)
+INCLUDE_DIRECTORIES(${SCC_INCLUDE_DIRS})
+
+# ======================================================
+# Link directories to add to the user project:
+# ======================================================
+SET(SCC_LIB_DIR @CMAKE_LIB_DIRS_CONFIGCMAKE@)
+LINK_DIRECTORIES(${SCC_LIB_DIR})
+
+# ======================================================
+# Other useful cmake modules
+# ======================================================
+SET(CMAKE_MODULE_PATH @SCC_CMAKE_DIR_CONFIGCMAKE@ ${CMAKE_MODULE_PATH})
+INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/SCCToolKitUtils.cmake)
+
+# Whether SCCToolKit was built with shared libraries.
+SET(SCC_BUILD_SHARED_LIBS @SCC_BUILD_SHARED_LIBS@)
+IF(NOT SCC_BUILD_SHARED_LIBS)
+  SET(CMAKE_CXX_FLAGS "-DSCC_Static")
+ENDIF(NOT SCC_BUILD_SHARED_LIBS)
+
+#IF (NOT @SCC_BUILD_SHARED_LIBS@)
+	# Under static libs, the user of VisualLog needs access to the 3rdparty libs as well:
+	#LINK_DIRECTORIES("@CMAKE_BINARY_DIR@/3rdparty/lib")
+
+	# Qt dependencies may need or may not need,
+	# FIXME: how to integrate Qt lib dependencies?
+	# qmake takes care of everything?
+	SET(SCC_LIBS 
+	  @SCC_LIBS_CONFIGCMAKE@
+	  )
+	# The standard libs BEFORE (SCC_LIBS) since these can have "debug","optimized".
+#ENDIF(NOT @SCC_BUILD_SHARED_LIBS@)
+
+# ======================================================
+# This and dependent project source directories:
+# ======================================================
+SET(OpenCV_DIR		 @OpenCV_DIR@)
+#SET(OpenCV-EX_DIR	 @OpenCV-EX_DIR@)
+#SET(OpenIGTLink_DIR      @OpenIGTLink_DIR@)
+SET(QT_QMAKE_EXECUTABLE  @QT_QMAKE_EXECUTABLE@)
+FIND_PACKAGE(Qt4 REQUIRED)
+INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/Qt4MacrosExtra.cmake)
+IF(@SCC_WITH_DECKLINK@)
+  SET(DeckLinkSDK_PATH   @DeckLinkSDK_PATH@)
+ENDIF()
+SET(SCC_SOURCE_DIR       @SCC_SOURCE_DIR@)
+
+# ======================================================
+#  Version variables: 
+# ======================================================
+SET(SCC_VERSION @SCC_VERSION@)
+SET(SCC_VERSION_MAJOR  @SCC_VERSION_MAJOR@)
+SET(SCC_VERSION_MINOR  @SCC_VERSION_MINOR@)
+SET(SCC_VERSION_PATCH  @SCC_VERSION_PATCH@)
+
+
+#-----------------------------------------------------------------------------
+# Environment dependent part
+#
+if(APPLE)
+  if(CMAKE_GENERATOR STREQUAL "Xcode")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  else()
+    # cmake incorrectly applies CXX compiler and flags to *.m files.
+    # that affects Makefile. Xcode safely avoid this issue.
+    add_definitions(-Doverride=)
+    add_definitions(-Dnullptr=NULL)
+  endif()
+endif()

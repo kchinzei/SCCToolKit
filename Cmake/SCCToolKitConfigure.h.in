@@ -1,0 +1,62 @@
+/*=========================================================================
+
+  Program:   Small Computings for Clinicals Project
+  Module:    $HeadURL: $
+  Language:  C/C++/ObjC
+  Date:      $Date: $
+  Version:   $Revision: $
+
+  Kiyoyuki Chinzei, Ph.D.
+  (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
+  This work is supported by NEDO P10003 "Intelligent Surgical Instruments Project", Japan.
+
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+// Original disclaimer is ...
+/*=========================================================================
+
+  Program:   Open IGT Link Library
+  Module:    $HeadURL: http://svn.na-mic.org/NAMICSandBox/trunk/OpenIGTLink/igtlConfigure.h.in
+  Language:  C
+  Date:      $Date: 2008-12-23 09:05:42 +0900
+  Version:   $Revision: 3460
+
+  Copyright (c) Insight Software Consortium. All rights reserved.
+
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#ifndef __SCC_CONFIGURE_H
+#define __SCC_CONFIGURE_H
+
+#cmakedefine SCC_PLATFORM_MACOSX
+#cmakedefine SCC_PLATFORM_LINUX 
+#cmakedefine SCC_PLATFORM_WIN32
+#ifdef SCC_PLATFORM_WIN32
+  #ifndef _WIN32
+    #define _WIN32
+  #endif
+  #ifndef WIN32
+    #define WIN32
+  #endif
+  //#define SCCCommon_EXPORTS
+#endif
+
+#cmakedefine SCC_USE_PTHREADS
+#cmakedefine SCC_USE_WIN32_THREADS
+#cmakedefine SCC_USE_SPROC
+
+#cmakedefine SCC_WITH_CIIMAGE
+#cmakedefine SCC_WITH_DISPATCH
+#cmakedefine SCC_WITH_DECKLINK
+
+#endif /*__SCC_CONFIGURE_H */
+
+
+

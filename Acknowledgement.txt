@@ -1,0 +1,11 @@
+Acknowledgement
+---------------
+
+This work is/was supported by many research fundings including
+  * NEDO P10003 "Intelligent Surgical Instruments Project", Japan.
+  * MHLW H24-Area-Norm-007 "Super Sensitive Endoscope", Japan.
+  * AIST "Regulatory Science Platform" FS, Japan.
+
+Thank you very much for supporting this activity.
+
+Small Computings for Clinicals
