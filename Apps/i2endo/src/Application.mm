@@ -250,8 +250,8 @@ void Application::initialize(void)
             Cap::CaptureQtKit *cqk = (Cap::CaptureQtKit *)cap;
             cqk->mUseInternalCameras = false;
         }
-        const char *c = readSettings_CapUniqueID(i).toAscii().data();
-        strlcpy(cap->mUniqueID, c, kCaptureBufLen);
+        //const char *c = readSettings_CapUniqueID(i).toAscii().data();
+        //strlcpy(cap->mUniqueID, c, kCaptureBufLen);
         
         if (cap->init() == false) {
             //std::cerr << "Fail to open capture #" << i << std::endl;

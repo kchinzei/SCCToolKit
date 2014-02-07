@@ -124,7 +124,34 @@ void Application::onReqQuit(void)
 void Application::imagesArrived(Cap::Capture* capture)
 {
     CIImage *img[nCameras];
+
+    for (int i=0; i<nCameras; i++) {
+        img[i] = captures[i]->retrieveCIImage();
+        captures[i]->lock();
+    }
     
+    CIImage *img0, *img1, *imgOut; // It's necessary for a block to handle array object outside block.
+    
+    img0 = img[0];
+    img1 = img[1];
+    if (!captures[1]->isReady())
+        img1 = img0;
+    if (!captures[0]->isReady())
+        img0 = img1;
+
+    if (captures[2]->isReady()) {
+        imgOut = [mChromakey updateFilter:img[2] withBkgnd:(mStatus.adjustChromaMode)? nil : img1];
+    } else {
+        imgOut = img1;
+    }
+    dispatch_async(mMainQueue, ^{
+        emit(reqUpdateImages(img0, imgOut));
+    });
+    
+    for (int i=0; i<nCameras; i++) {
+        captures[i]->unlock();
+    }
+/*
     for (int i=0; i<nCameras; i++) {
         img[i] = captures[i]->retrieveCIImage();
         captures[i]->lock();
@@ -144,6 +171,7 @@ void Application::imagesArrived(Cap::Capture* capture)
     for (int i=0; i<nCameras; i++) {
         captures[i]->unlock();
     }
+*/
 }
 
 void Application::stateChanged(Cap::Capture* capture)
@@ -212,6 +240,7 @@ void Application::initialize(void)
 
     for (int i=0; i<nCameras; i++) {
         Cap::CaptureType type = (Cap::CaptureType) readSettings_CapType(i);
+        //Cap::CaptureType type = Cap::kCaptureTypeQtKit;
         if (type == Cap::kCaptureTypeUndefined)
             type = Cap::kCaptureTypeQtKit;
         
@@ -222,12 +251,11 @@ void Application::initialize(void)
             return;
         }
         
-        // Debug purpose
         Cap::CaptureQtKit *cqk = (Cap::CaptureQtKit *)cap;
-        cqk->mUseInternalCameras = true;
+        cqk->mUseInternalCameras = false;
         
-        const char *c = readSettings_CapUniqueID(i).toAscii().data();
-        strlcpy(cap->mUniqueID, c, kCaptureBufLen);
+        //const char *c = readSettings_CapUniqueID(i).toAscii().data();
+        //strlcpy(cap->mUniqueID, c, kCaptureBufLen);
 
         if (cap->init() == false) {
             //std::cerr << "Fail to open capture #" << i << std::endl;

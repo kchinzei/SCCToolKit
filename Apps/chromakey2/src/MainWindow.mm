@@ -80,6 +80,7 @@ void MainWindow::resizeUi_and_showWindow(int screenWidth)
         btn_setChroma->setGeometry(QRect(900, 730, 114, 32));
         label_camname1->setGeometry(QRect(0, 660, 512, 16));
         label_camname2->setGeometry(QRect(512, 660, 512, 16));
+        label_scc->setGeometry(QRect(10, 10, 140, 90));
         this->resize(1024, 768);
         if (screenWidth == 1024) {
             this->showFullScreen();
@@ -90,6 +91,7 @@ void MainWindow::resizeUi_and_showWindow(int screenWidth)
     } else {
         viewL->setGeometry(QRect(0, 60, 960, 960));
         viewR->setGeometry(QRect(960, 60, 960, 960));
+        label_scc->setGeometry(QRect(10, 10, 70, 45));
         label_logo->setGeometry(QRect(1804, 8, 110, 45));
         label_msg->setGeometry(QRect(8, 1044, 1024, 31));
         btn_setChroma->setGeometry(QRect(1800, 1044, 114, 32));
