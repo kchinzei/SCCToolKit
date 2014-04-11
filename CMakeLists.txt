@@ -56,6 +56,8 @@ scc_define_option(SCC_WITH_DECKLINK	"Use BlckMagicDesign's DeckLink extension. T
 # Dependent modules for SCCToolKit:
 # You can copy the following into your CMakeLists.txt
 
+set(DESIRED_QT_VERSION 4)
+
 FIND_PACKAGE(Qt REQUIRED)
 #FIND_PACKAGE(Qt4 REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)

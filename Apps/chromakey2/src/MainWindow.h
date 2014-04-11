@@ -28,7 +28,6 @@
 #include "ui_MainWindow_1024.h"
 #include "ApplicationStatus.h"
 
-class cv::Mat;
 class QString;
 class QVariant;
 

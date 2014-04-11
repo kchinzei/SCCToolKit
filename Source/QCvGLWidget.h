@@ -27,7 +27,7 @@
 #include "CaptureTypes.h"
 
 class QImage;
-class cv::Mat;
+@class CIImage;
 
 class QCvGLWidget : public QGLWidget
 {
