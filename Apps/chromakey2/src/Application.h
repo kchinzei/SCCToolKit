@@ -70,8 +70,13 @@ private:
     void readSettings();
     int  readSettings_CapType(int idx);
     QString readSettings_CapUniqueID(int idx);
+#if QT_VERSION >= 0x050000
+	class QMessageLogContext;
+	static void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+#else
     static void myMessageOutput(QtMsgType type, const char *msg);
-
+#endif
+	
 private:
 	ApplicationStatus mStatus;
     MainWindow* mWindow;

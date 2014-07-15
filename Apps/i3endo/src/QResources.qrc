@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="images">
-    <file>QResources/aist_90.png</file>
-    <file>QResources/isip_90.png</file>
-  </qresource>
-</RCC>

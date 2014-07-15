@@ -1,7 +1,25 @@
+# ===================================================================================
 #
-# Override Qt4Macros + more
-# Original from Qt4Macros.cmake
+#  SCCToolKit Macro
 #
+#  Since version 2.8.4, cmake provided Qt-related commands such as automoc. Also cmake had macros like qt4_wrap_cpp
+#  These coomads and macros assume sources are C++. In SCCToolKit for Mac we use Objective-C++, which causes
+#  many errors when applying cmake's built-in Qt functions.
+#  Since Qt 5, macros are integrated in Qt package, but the situation was the same.
+#   Qt4MacrosExtra.cmake is a set of patches to Qt4 macros to override Qt4Macros.
+#
+#  Program:   Intelligent Surgical Instruments Project
+#  Module:    $HeadURL: $
+#  Language:  Cmake
+#  Date:      $Date: $
+#  Version:   $Revision: $
+#
+#  (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
+#  This work is/was supported by
+#             AIST Strategic Funding
+#             MHLW H24-Area-Norm-007
+#             NEDO P10003 "Intelligent Surgical Instruments Project"
+# ===================================================================================
 
 #=============================================================================
 # Copyright 2005-2009 Kitware, Inc.
@@ -16,13 +34,6 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-
-# QT4_WRAP_CPP(outfiles inputfile ... )
-
-MACRO (SCC_MARK_AS_OBJECTIVE_C)
-  set(_label "OBJC")
-  set_source_files_properties(${ARGN} PROPERTIES LABELS ${_label})
-ENDMACRO (SCC_MARK_AS_OBJECTIVE_C)
 
 # QT4_WRAP_CPP(outfiles inputfile ... )
 
@@ -103,14 +114,15 @@ MACRO(QT4_CREATE_TRANSLATION _qm_files)
        ENDFOREACH(_pro_src ${_my_sources})
        SET(_pro_includes)
        GET_DIRECTORY_PROPERTY(_inc_DIRS INCLUDE_DIRECTORIES)
+       LIST(REMOVE_DUPLICATES _inc_DIRS)
        FOREACH(_pro_include ${_inc_DIRS})
          GET_FILENAME_COMPONENT(_abs_include "${_pro_include}" ABSOLUTE)
          SET(_pro_includes "${_pro_includes} \"${_abs_include}\"")
        ENDFOREACH(_pro_include ${CMAKE_CXX_INCLUDE_PATH})
        if(${_pro_objc_srcs})
-	 FILE(WRITE ${_ts_pro} "SOURCES = ${_pro_srcs}\nINCLUDEPATH = ${_pro_includes}\n")
-       else()
 	 FILE(WRITE ${_ts_pro} "CONFIG += objective_c\nSOURCES = ${_pro_srcs}\nOBJECTIVE_SOURCES = ${_pro_objc_srcs}\nINCLUDEPATH = ${_pro_includes}\n")
+       else()
+	 FILE(WRITE ${_ts_pro} "SOURCES = ${_pro_srcs}\nINCLUDEPATH = ${_pro_includes}\n")
        endif()
      ENDIF(_my_sources)
      ADD_CUSTOM_COMMAND(OUTPUT ${_ts_file}

@@ -17,7 +17,7 @@
  
  =========================================================================*/
 
-#include <QtGui>
+#include <QApplication>
 #include <dispatch/dispatch.h>
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 		progname = argv[0];
 
     // QApplication is used for handring the event loop
-	QApplication app(argc,argv);
+	QApplication app(argc, argv);
     
     // Command line parse as a standard unix main()...
     while ((ch = getopt(argc, argv, "f:m:w:h:")) != -1) {

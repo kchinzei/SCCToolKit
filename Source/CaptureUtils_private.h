@@ -26,7 +26,7 @@
 #include "CaptureUtils.h"
 
 namespace Cap {
-	class CaptureStateStringGenerator : public QObject
+	class CaptureStateStringGenerator : protected QObject
 	{
 		Q_OBJECT
 

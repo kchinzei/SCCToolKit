@@ -127,17 +127,17 @@ ENDIF(APPLE)
 # this command will generate rules that will run rcc on all files from QTTEST_RCS
 # in result QTTEST_GEN_RCS variable will contain paths to files produced by rcc
 #
-QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+#set(AUTO_RCC ON)
 
 #--------------------------------------------------------------------------------
 # this will run uic on .ui files:
 #
-QT4_WRAP_UI(UI_HDRS ${UI_FILES})
+#QT_WRAP_UI(UI_HDRS ${UI_FILES})
 
 #--------------------------------------------------------------------------------
 # and finally this will run moc on the headers
 #
-QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
+QT_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 
 #--------------------------------------------------------------------------------
 # we need this to be able to include headers produced by uic in our code
@@ -166,13 +166,13 @@ SET(FILES_TO_TRANSLATE
 # we include the translation files. The location needs to be hard coded in QTranslator.
 #
 if (SCC_UPDATE_QT_TSFILES)
-  qt4_create_translation(
+  qt_create_translation(
     QM_FILES
     ${FILES_TO_TRANSLATE}
     ${TS_FILES}
   )
 else ()
-  qt4_add_translation(QM_FILES ${TS_FILES})
+  qt_add_translation(QM_FILES ${TS_FILES})
 endif () 
 add_custom_target (translations_target DEPENDS ${QM_FILES})
 

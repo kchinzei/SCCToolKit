@@ -18,7 +18,8 @@
  =========================================================================*/
 
 #include <dispatch/dispatch.h>
-#include <QtGui>
+#include <QApplication>
+#include <QMainWindow>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "CaptureCenter.h"
 #include "QCvGLWidget.h"

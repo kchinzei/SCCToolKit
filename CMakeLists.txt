@@ -7,10 +7,8 @@
 # 
 # Kiyoyuki Chinzei, Ph.D.
 # (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
-# This work is/was supported by
-# * NEDO P10003 "Intelligent Surgical Instruments Project", Japan.
-# * MHLW H24-Area-Norm-007 "Super Sensitive Endoscope", Japan.
-# * AIST "Regulatory Science Platform" FS, Japan.
+# Acknowledgement: This work is/was supported by many research fundings.
+# See Acknowledgement.txt
 # 
 # This software is distributed WITHOUT ANY WARRANTY; without even
 # the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -20,7 +18,7 @@
 
 PROJECT( SCC )
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.10)
 
 SET(SCC_CMAKE_DIR "${SCC_SOURCE_DIR}/CMake")
 SET(CMAKE_MODULE_PATH "${SCC_CMAKE_DIR}" ${CMAKE_MODULE_PATH})
@@ -51,15 +49,12 @@ scc_define_option(SCC_CONFIG_ALLINONE   "SCCToolKitConfig.cmake includes externa
 scc_define_option(SCC_WITH_DISPATCH	"Use Grand Central Dispatch (libdispatch) (OSX only)."		ON	IF APPLE)
 scc_define_option(SCC_WITH_CIIMAGE	"Use CIImage extension (OSX only)."				ON	IF APPLE)
 scc_define_option(SCC_WITH_DECKLINK	"Use BlckMagicDesign's DeckLink extension. The SDK required."	ON)
+scc_define_option(SCC_QT_MAJOR_VERSION	"Desired Qt version. If OpenCV built with Qt, that one used."	4	TYPE STRING)
 
 #-----------------------------------------------------------------------------
 # Dependent modules for SCCToolKit:
 # You can copy the following into your CMakeLists.txt
 
-set(DESIRED_QT_VERSION 4)
-
-FIND_PACKAGE(Qt REQUIRED)
-#FIND_PACKAGE(Qt4 REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCV-EX QUIET)
 #FIND_PACKAGE(OpenIGTLink QUIET)
@@ -68,17 +63,48 @@ IF(SCC_WITH_DECKLINK)
   FIND_PACKAGE(DeckLinkSDK REQUIRED)
 ENDIF(SCC_WITH_DECKLINK)
 
-IF(QT4_FOUND)
+# Try to find Qt. If OpenCV was built with Qt, we use it. Read OpenCV's cache
+# This may change SCC_QT_MAJOR_VERSION
+scc_read_opencv_config()
+
+# Try to find our version.
+IF(SCC_QT_MAJOR_VERSION EQUAL 4)
   SET(QT_USE_QTOPENGL YES)
-  INCLUDE(${QT_USE_FILE})
-ENDIF(QT4_FOUND)
-INCLUDE(${SCC_CMAKE_DIR}/Qt4MacrosExtra.cmake)
+  FIND_PACKAGE(Qt4 4.8 REQUIRED QtCore QtGui QtOpenGL)
+  IF(QT4_FOUND)
+    INCLUDE(${QT_USE_FILE})
+  ENDIF(QT4_FOUND)
+  INCLUDE("${SCC_CMAKE_DIR}/Qt4MacrosExtra.cmake")
+  INCLUDE("${SCC_CMAKE_DIR}/QtMacrosExtra.cmake")
+ELSEIF(SCC_QT_MAJOR_VERSION EQUAL 5)
+  FIND_PACKAGE(Qt5Core)
+  # First of all we need to find Qt5Core.
+  # If it's not found, cmake asks user gives the path. Once Qt5Core is found, scc_read_opencv_config() can guess others.
+  if(Qt5Core_FOUND)
+    scc_guess_qt5module_dir(Qt5Gui)
+    scc_guess_qt5module_dir(Qt5Widgets)
+    scc_guess_qt5module_dir(Qt5OpenGL)
+    scc_guess_qt5module_dir(Qt5Concurrent)
+    scc_guess_qt5module_dir(Qt5LinguistTools)
+    FIND_PACKAGE(Qt5Gui REQUIRED)
+    FIND_PACKAGE(Qt5Widgets REQUIRED)
+    FIND_PACKAGE(Qt5OpenGL REQUIRED)
+    FIND_PACKAGE(Qt5Concurrent REQUIRED)
+    FIND_PACKAGE(Qt5LinguistTools REQUIRED)
+    if(Qt5Gui_FOUND AND Qt5Widgets_FOUND AND Qt5Concurrent_FOUND AND Qt5OpenGL_FOUND AND Qt5LinguistTools_FOUND)
+      set(QT5_FOUND ON)
+      include("${SCC_CMAKE_DIR}/Qt5MacrosExtra.cmake")
+      include("${SCC_CMAKE_DIR}/QtMacrosExtra.cmake")
+      set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets Qt5::OpenGL Qt5::Concurrent)
+    else()
+      message(FATAL_ERROR "Some of Qt5 modules not found even though Qt5Core was found. Qt5 installation may have problem.")
+    endif()
+  endif()
+ENDIF()
 
-scc_define_option(SCC_UPDATE_QT_TSFILES "Compile Qt translation files (WARNING: don't leave it ON.) "   OFF	IF QT4_FOUND)
-
-IF(OPENCV_FOUND)
-  # nothing to do now
-ENDIF(OPENCV_FOUND)
+IF(QT4_FOUND OR QT5_FOUND)
+  scc_define_option(SCC_UPDATE_QT_TSFILES "Compile Qt translation files (WARNING: don't leave it ON.) "   OFF)
+ENDIF()
 
 #IF(OpenIGTLink_FOUND)
 #  INCLUDE("${OpenIGTLink_USE_FILE}")
@@ -186,7 +212,6 @@ SET(SCC_TARGET_LIBS
 	${SCC_LIB_NAMES}
 	${SCC_EXTERNAL_LIBS}
 	)
-
 
 #-----------------------------------------------------------------------------
 # Add compiler flags SCCToolKit needs to work on this platform.  

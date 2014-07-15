@@ -84,17 +84,19 @@ SET(FILES_TO_TRANSLATE
 # this command will generate rules that will run rcc on all files from QTTEST_RCS
 # in result QTTEST_GEN_RCS variable will contain paths to files produced by rcc
 #
-QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+#QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+set(auto_rcc ON)
 
 #--------------------------------------------------------------------------------
 # this will run uic on .ui files:
 #
-QT4_WRAP_UI(UI_HDRS ${UI_FILES})
+#QT4_WRAP_UI(UI_HDRS ${UI_FILES})
+set(auto_uic ON)
 
 #--------------------------------------------------------------------------------
 # and finally this will run moc on the headers
 #
-QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
+QT_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 
 #--------------------------------------------------------------------------------
 # we need this to be able to include headers produced by uic in our code

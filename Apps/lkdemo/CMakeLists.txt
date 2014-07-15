@@ -113,24 +113,28 @@ ENDIF (WIN32)
 #--------------------------------------------------------------------------------
 # QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that contains a path to
 # a CMake script that sets up this directory for building with Qt4
+# Qt5 does not use it.
 #
-INCLUDE(${QT_USE_FILE})
+if(QT_USE_FILE)
+  include(${QT_USE_FILE})
+endif(QT_USE_FILE)
 
 #--------------------------------------------------------------------------------
 # this command will generate rules that will run rcc on all files from QTTEST_RCS
 # in result QTTEST_GEN_RCS variable will contain paths to files produced by rcc
 #
-QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+#QT_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+set(CMAKE_AUTORCC ON)
 
 #--------------------------------------------------------------------------------
 # this will run uic on .ui files:
 #
-QT4_WRAP_UI(UI_HDRS ${UI_FILES})
+QT_WRAP_UI(UI_HDRS ${UI_FILES})
 
 #--------------------------------------------------------------------------------
 # and finally this will run moc on the headers
 #
-QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
+QT_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
@@ -138,13 +142,13 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 # we include the translation files. The location needs to be hard coded in QTranslator.
 #
 if (APP_UPDATE_QT_TSFILES)
-  qt4_create_translation(
+  qt_create_translation(
     QM_FILES
     ${FILES_TO_TRANSLATE}
     ${TS_FILES}
   )
 else ()
-  qt4_add_translation(QM_FILES ${TS_FILES})
+  qt_add_translation(QM_FILES ${TS_FILES})
 endif () 
 add_custom_target (translations_target DEPENDS ${QM_FILES})
 

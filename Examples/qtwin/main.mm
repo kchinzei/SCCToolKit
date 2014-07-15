@@ -17,7 +17,8 @@
  
  =========================================================================*/
 
-#include <QtGui>
+#include <QApplication>
+#include <QMainWindow>
 #include <QtDebug>
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"

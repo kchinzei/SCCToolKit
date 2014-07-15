@@ -34,7 +34,7 @@ class QCvGraphicsView : public QGraphicsView
 
 public:
 	QCvGraphicsView(QWidget* parent = nullptr);
-	virtual ~QCvGraphicsView() override;
+	~QCvGraphicsView() override;
     void updateImage(cv::Mat& mat);
 
     Cap::PaintMode paintMode;

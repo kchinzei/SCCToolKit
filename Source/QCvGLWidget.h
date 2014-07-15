@@ -35,7 +35,7 @@ class QCvGLWidget : public QGLWidget
 
 public:
 	QCvGLWidget(QWidget* parent = 0, const QGLWidget * shareWidget = 0, Qt::WindowFlags f = 0);
-    ~QCvGLWidget() override;
+    virtual ~QCvGLWidget() override;
     void updateImage(cv::Mat& mat);
     void updateImage(CIImage *img);
     void clear(void);

@@ -20,15 +20,17 @@
 #      - SCC_VERSION_MINOR : Minor version part of SCC_VERSION. Example: "2"
 #      - SCC_VERSION_PATCH : Patch version part of SCC_VERSION. Example: "0"
 #
-#
 #  Program:   Intelligent Surgical Instruments Project
 #  Module:    $HeadURL: $
 #  Language:  Cmake
 #  Date:      $Date: $
 #  Version:   $Revision: $
 #
-#  (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
-#  This work is supported by NEDO P10003 "Intelligent Surgical Instruments Project", Japan.
+# Kiyoyuki Chinzei, Ph.D.
+# (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
+#
+# Acknowledgement: This work is/was supported by many research fundings.
+# See Acknowledgement.txt
 #
 #  This file was edited from OpenCV (May 2010). 
 #  Thank you for the great software.
@@ -60,9 +62,6 @@ IF(NOT SCC_BUILD_SHARED_LIBS)
 ENDIF(NOT SCC_BUILD_SHARED_LIBS)
 
 #IF (NOT @SCC_BUILD_SHARED_LIBS@)
-	# Under static libs, the user of VisualLog needs access to the 3rdparty libs as well:
-	#LINK_DIRECTORIES("@CMAKE_BINARY_DIR@/3rdparty/lib")
-
 	# Qt dependencies may need or may not need,
 	# FIXME: how to integrate Qt lib dependencies?
 	# qmake takes care of everything?
@@ -78,9 +77,29 @@ ENDIF(NOT SCC_BUILD_SHARED_LIBS)
 SET(OpenCV_DIR		 @OpenCV_DIR@)
 #SET(OpenCV-EX_DIR	 @OpenCV-EX_DIR@)
 #SET(OpenIGTLink_DIR      @OpenIGTLink_DIR@)
-SET(QT_QMAKE_EXECUTABLE  @QT_QMAKE_EXECUTABLE@)
-FIND_PACKAGE(Qt4 REQUIRED)
-INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/Qt4MacrosExtra.cmake)
+FIND_PACKAGE(OpenCV REQUIRED)
+IF(@SCC_QT_MAJOR_VERSION@ EQUAL 4)
+  SET(QT_QMAKE_EXECUTABLE  @QT_QMAKE_EXECUTABLE@)
+  SET(QT_USE_QTOPENGL YES)
+  FIND_PACKAGE(Qt4 4.8 REQUIRED QtCore QtGui QtOpenGL)
+  INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/Qt4MacrosExtra.cmake)
+  INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/QtMacrosExtra.cmake)
+ELSEIF(@SCC_QT_MAJOR_VERSION@ EQUAL 5)
+  SET(Qt5Concurrent_DIR @Qt5Concurrent_DIR@)
+  SET(Qt5Core_DIR @Qt5Core_DIR@)
+  SET(Qt5Gui_DIR @Qt5Gui_DIR@)
+  SET(Qt5LinguistTools_DIR @Qt5LinguistTools_DIR@)
+  SET(Qt5OpenGL_DIR @Qt5OpenGL_DIR@)
+  SET(Qt5Widgets_DIR @Qt5Widgets_DIR@)
+  FIND_PACKAGE(Qt5Core)
+  FIND_PACKAGE(Qt5Gui)
+  FIND_PACKAGE(Qt5Widgets)
+  FIND_PACKAGE(Qt5Concurrent)
+  FIND_PACKAGE(Qt5OpenGL)
+  FIND_PACKAGE(Qt5LinguistTools)
+  INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/Qt5MacrosExtra.cmake)
+  INCLUDE(@SCC_CMAKE_DIR_CONFIGCMAKE@/QtMacrosExtra.cmake)
+ENDIF()
 IF(@SCC_WITH_DECKLINK@)
   SET(DeckLinkSDK_PATH   @DeckLinkSDK_PATH@)
 ENDIF()

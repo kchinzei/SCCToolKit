@@ -31,7 +31,11 @@
 #include <QDesktopWidget>
   
 #include <stdexcept>
+#if QT_VERSION >= 0x050000
+#include <qlogging.h>
+#else
 #include <qapplication.h>   // For qInstallMsgHandler()
+#endif
 
 #include "MainWindow.h"
 #include "CaptureUtils.h"
@@ -229,7 +233,11 @@ void Application::initialize(void)
 
     // Create the main window (and other) and show it.
 	createWindows();
+#if QT_VERSION >= 0x050000
+	qInstallMessageHandler((QtMessageHandler)myMessageOutput);
+#else
     qInstallMsgHandler(myMessageOutput);
+#endif
     int h = mWindow->getViewH();
     int w = mWindow->getViewW();
     
@@ -408,6 +416,27 @@ void Application::updateMessageBox(QMessageBox::Icon icon, const char *msg)
     });
 }
 
+#if QT_VERSION >= 0x050000
+void Application::myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+	QByteArray localMsg = msg.toLocal8Bit();
+    switch (type) {
+        case QtDebugMsg:
+            std::cerr << "Debug: " << localMsg.constData();
+            break;
+        case QtWarningMsg:
+            gApp->updateMessageBox(QMessageBox::Warning, localMsg.constData());
+            break;
+        case QtCriticalMsg:
+            gApp->updateMessageBox(QMessageBox::Critical, localMsg.constData());
+            break;
+        case QtFatalMsg:
+            std::cerr << "Fatal: " << localMsg.constData();
+            abort();
+    }
+}
+
+#else
 void Application::myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
@@ -425,3 +454,4 @@ void Application::myMessageOutput(QtMsgType type, const char *msg)
             abort();
     }
 }
+#endif

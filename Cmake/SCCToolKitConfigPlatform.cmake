@@ -8,9 +8,12 @@
 #  Date:      $Date: $
 #  Version:   $Revision: $
 #
+#  Kiyoyuki Chinzei, Ph.D.
 #  (c) National Institute of Advanced Industrial Science and Technology (AIST), Japan All rights reserved.
-#  This work is supported by NEDO P10003 "Intelligent Surgical Instruments Project", Japan.
 #
+#  Acknowledgement: This work is/was supported by many research fundings.
+#  See Acknowledgement.txt
+# 
 #  This CMakeLists.txt was copied from OpenIGTLink (around Oct 2009).
 #
 #  This software is distributed WITHOUT ANY WARRANTY; without even

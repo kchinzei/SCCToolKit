@@ -93,17 +93,19 @@ set(QT_USE_QTOPENGL YES)
 # this command will generate rules that will run rcc on all files from QTTEST_RCS
 # in result QTTEST_GEN_RCS variable will contain paths to files produced by rcc
 #
-QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+#QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+set(AUTO_RCC ON)
 
 #--------------------------------------------------------------------------------
 # this will run uic on .ui files:
 #
-QT4_WRAP_UI(UI_HDRS ${UI_FILES})
+#QT4_WRAP_UI(UI_HDRS ${UI_FILES})
+set(AUTO_UIC ON)
 
 #--------------------------------------------------------------------------------
 # and finally this will run moc on the headers
 #
-QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
+QT_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 
 #ADD_DEFINITIONS(${QT_DEFINITIONS})
 
