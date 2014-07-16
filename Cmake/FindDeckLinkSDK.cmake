@@ -71,7 +71,7 @@ IF(EXISTS "${DeckLinkSDK_PATH}/${DeckLinkSDK_INCLUDE_FILE}")
     ENDIF(DeckLinkSDK_SRC_FILE)
     SET(DeckLinkSDK_PATH
       "${DeckLinkSDK_PATH}"
-      CACHE FILEPATH "Where DeckLinkSDK locates.")
+      CACHE PATH "Where DeckLinkSDK locates.")
 #    MARK_AS_ADVANCED(
 #      DeckLinkSDK_INCLUDE_PATH
 #      DeckLinkSDK_INCLUDE_FILE
@@ -82,7 +82,7 @@ ELSE()
     UNSET(DeckLinkSDK_PATH CACHE)
     SET(DeckLinkSDK_PATH
       DeckLinkSDK-NOTFOUND
-      CACHE FILEPATH "Where DeckLinkSDK locates.")
+      CACHE PATH "Where DeckLinkSDK locates.")
 ENDIF()
 
 # Handle the QUIETLY and REQUIRED arguments and set DeckLinkSDK_FOUND to TRUE if 
