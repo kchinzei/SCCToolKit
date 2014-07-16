@@ -70,7 +70,7 @@ scc_read_opencv_config()
 # Try to find our version.
 IF(SCC_QT_MAJOR_VERSION EQUAL 4)
   SET(QT_USE_QTOPENGL YES)
-  FIND_PACKAGE(Qt4 4.8 REQUIRED QtCore QtGui QtOpenGL)
+  FIND_PACKAGE(Qt4 4.7 REQUIRED QtCore QtGui QtOpenGL)
   IF(QT4_FOUND)
     INCLUDE(${QT_USE_FILE})
   ENDIF(QT4_FOUND)
