@@ -1,0 +1,22 @@
+License
+Copyright (c) 2013- K.Chinzei, AIST
+
+SCCToolKit is licensed under the following terms otherwise stated in individual file.
+
+1. The user (including but not limited to individual, corporate, academic, governmental, the "User") of a copy of this software and associated documentation files (the "Software") shall acknowledge the following aspects
+
+a) The Software is for research and experimental purpose. It is not intended to be used in routine clinical practice.
+
+b) The Software and derivative programs using the Software may contain functions that may require regulatory clearance as a medical device in certain countries and regions.
+
+
+2. MIT License is applied as the following.
+
+http://opensource.org/licenses/mit-license.php
+The MIT License (MIT)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

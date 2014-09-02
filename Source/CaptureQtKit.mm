@@ -186,8 +186,8 @@ static const char* kCaptureQtKit_excludeModelNameList[] = {
     nullptr
 };
 static const char* kCaptureQtKit_internalCameraNameList[] = {
-    "FaceTime Camera",
-    "Display iSight",
+    "FaceTime",
+    "iSight",
     nullptr
 };
 
@@ -200,10 +200,14 @@ static bool nameContainsExcludeModelName(const NSString* str, bool useInternalCa
         NSString *excludeModelName = [NSString stringWithUTF8String:*p];
         result = [str hasPrefix:excludeModelName];
         if (result) goto name_match;
+        result = [str hasSuffix:excludeModelName];
+        if (result) goto name_match;
     }
     for (const char* *p=kCaptureQtKit_internalCameraNameList; *p!=nullptr && !useInternalCameras; p++) {
         NSString *excludeModelName = [NSString stringWithUTF8String:*p];
         result = [str hasPrefix:excludeModelName];
+        if (result) goto name_match;
+        result = [str hasSuffix:excludeModelName];
         if (result) goto name_match;
     }
 name_match:
@@ -385,6 +389,8 @@ bool CaptureQtKit::init(void)
                          encoding:NSASCIIStringEncoding];
     [[device localizedDisplayName] getCString:mModelName
                                     maxLength:kCaptureBufLen
+     // FIXME : thhis may cause mojibake.
+                                     //encoding:NSShiftJISStringEncoding];
                                      encoding:NSUTF8StringEncoding];
 
 bail:
