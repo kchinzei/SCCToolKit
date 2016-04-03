@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   Small Computings for Clinicals Project
+ program:   Small Computings for Clinicals Project
  Module:    $HeadURL: $
  Date:      $Date: $
  Version:   $Revision: $
@@ -421,7 +421,10 @@ void Application::myMessageOutput(QtMsgType type, const QMessageLogContext &cont
 {
 	QByteArray localMsg = msg.toLocal8Bit();
     switch (type) {
-        case QtDebugMsg:
+		case QtInfoMsg:
+            std::cerr << "Info: " << localMsg.constData();
+            break;
+		case QtDebugMsg:
             std::cerr << "Debug: " << localMsg.constData();
             break;
         case QtWarningMsg:
@@ -440,6 +443,9 @@ void Application::myMessageOutput(QtMsgType type, const QMessageLogContext &cont
 void Application::myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
+		case QtInfoMsg:
+            std::cerr << "Info: " << localMsg.constData();
+            break;
         case QtDebugMsg:
             std::cerr << "Debug: " << msg;
             break;
