@@ -55,11 +55,11 @@ namespace Cap {
         float getFPS(void) override {return fps;};
         
     private:
-        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID *ppv) { return E_NOINTERFACE; };
-        ULONG STDMETHODCALLTYPE AddRef(void);
-        ULONG STDMETHODCALLTYPE Release(void);
-        HRESULT STDMETHODCALLTYPE VideoInputFormatChanged(BMDVideoInputFormatChangedEvents, IDeckLinkDisplayMode*, BMDDetectedVideoInputFormatFlags);
-        HRESULT STDMETHODCALLTYPE VideoInputFrameArrived(IDeckLinkVideoInputFrame*, IDeckLinkAudioInputPacket*);
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID *ppv) override { return E_NOINTERFACE; };
+        ULONG STDMETHODCALLTYPE AddRef(void) override;
+        ULONG STDMETHODCALLTYPE Release(void) override;
+        HRESULT STDMETHODCALLTYPE VideoInputFormatChanged(BMDVideoInputFormatChangedEvents, IDeckLinkDisplayMode*, BMDDetectedVideoInputFormatFlags) override;
+        HRESULT STDMETHODCALLTYPE VideoInputFrameArrived(IDeckLinkVideoInputFrame*, IDeckLinkAudioInputPacket*) override;
         
         void cleanup(void);
         

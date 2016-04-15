@@ -439,7 +439,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Chromakey2</string>
+   <string>EndoView</string>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>

@@ -28,7 +28,7 @@
 // Used before construct QSettings.
 #define kSettingsKey_Organization		"Small Computings for Clinicals"
 #define kSettingsKey_Domain				"aist.go.jp"
-#define kSettingsKey_Application		"cvstereoqt2"
+#define kSettingsKey_Application		"endoprocess"
 
 // CaptureCenter properties
 #define kSettingsKey_Cap_DesiredFPS     "Cap/DesiredFPS"

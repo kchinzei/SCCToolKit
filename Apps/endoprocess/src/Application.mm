@@ -202,7 +202,7 @@ void Application::initialize(void)
         }
         
         Cap::CaptureQtKit *cqk = (Cap::CaptureQtKit *)cap;
-        cqk->mUseInternalCameras = false;
+        cqk->mUseInternalCameras = true;
         
         //const char *c = readSettings_CapUniqueID(i).toAscii().data();
         //strlcpy(cap->mUniqueID, c, kCaptureBufLen);
@@ -349,6 +349,9 @@ void Application::myMessageOutput(QtMsgType type, const QMessageLogContext &cont
 {
 	QByteArray localMsg = msg.toLocal8Bit();
     switch (type) {
+        case QtInfoMsg:
+            std::cerr << "Info: " << localMsg.constData();
+            break;
         case QtDebugMsg:
             std::cerr << "Debug: " << localMsg.constData();
             break;

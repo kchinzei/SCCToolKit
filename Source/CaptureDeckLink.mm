@@ -293,7 +293,8 @@ static void initMatWithVideoFrame(cv::Mat *image, const CustomDeckLinkVideoFrame
 
 static void initCIImageWithMat(CIImage *img, const cv::Mat* mat, NSBitmapImageRep *bitmapRep)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+    //NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 /*
     CGSize siz = CGSizeMake(mat->cols, mat->rows);
     NSData *d = [NSData dataWithBytesNoCopy:const_cast<cv::Mat *>(mat)->ptr() length:mat->step*mat->rows*mat->elemSize() freeWhenDone:NO];
@@ -328,7 +329,8 @@ static void initCIImageWithMat(CIImage *img, const cv::Mat* mat, NSBitmapImageRe
                             bytesPerRow:mat->step
                            bitsPerPixel:bitsPerSample*samplesPerPixel];
     [img initWithBitmapImageRep:bitmapRep];
-    [pool drain];
+    //[pool drain];
+    }
 }
 
 static CIImage * makeCIImageFromMat(const cv::Mat* mat, NSBitmapImageRep **bitmapRep)

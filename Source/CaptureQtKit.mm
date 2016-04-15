@@ -31,12 +31,14 @@
 
 static CIImage * makeCIImageFromMat(cv::Mat* mat)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+    //NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     CGSize siz = CGSizeMake(mat->cols, mat->rows);
     NSData *d = [NSData dataWithBytesNoCopy:mat->ptr() length:mat->step*mat->rows*mat->elemSize() freeWhenDone:NO];
     CIImage *img = [[CIImage alloc] initWithBitmapData:d bytesPerRow:mat->step size:siz format:kCI_PIXEL_FMT colorSpace:nil];
-    [pool drain];
+    //[pool drain];
     return img;
+    }
 }
 
 @interface CaptureQtKitDelegate : NSObject
@@ -141,6 +143,7 @@ didDropVideoFrameWithSampleBuffer:(QTSampleBuffer *) sampleBuffer
         return;
     
     @synchronized (self) {
+        @autoreleasepool {
         self.newFrame = 0;
         
         CVPixelBufferRef pixels = self.mCurrentImageBuffer;
@@ -153,6 +156,7 @@ didDropVideoFrameWithSampleBuffer:(QTSampleBuffer *) sampleBuffer
         if (rowBytes != 0) {
             *(self.image) = cv::Mat(height, width, CV_8UC4, baseaddress, rowBytes);
             ciImage = (CIImage*)[ciImage initWithCVImageBuffer:mCurrentImageBuffer];
+        }
         }
     }
 }
@@ -193,8 +197,9 @@ static const char* kCaptureQtKit_internalCameraNameList[] = {
 
 static bool nameContainsExcludeModelName(const NSString* str, bool useInternalCameras)
 {
+    @autoreleasepool {
     bool result = false;
-    NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+    //NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
 
     for (const char* *p=kCaptureQtKit_excludeModelNameList; *p!=nullptr; p++) {
         NSString *excludeModelName = [NSString stringWithUTF8String:*p];
@@ -211,8 +216,9 @@ static bool nameContainsExcludeModelName(const NSString* str, bool useInternalCa
         if (result) goto name_match;
     }
 name_match:
-    [localpool drain];
+    //[localpool drain];
     return result;
+    }
 }
 
 CaptureQtKit::CaptureQtKit()
@@ -245,7 +251,8 @@ CaptureQtKit::~CaptureQtKit()
 
 void CaptureQtKit::cleanup()
 {
-    NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+    //NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
     
     [priv->mCaptureSession stopRunning];
     
@@ -257,11 +264,12 @@ void CaptureQtKit::cleanup()
     
     [priv->mCaptureDecompressedVideoOutput setDelegate:priv->mCaptureDecompressedVideoOutput];
     [priv->mCaptureDecompressedVideoOutput release];
-    [localpool drain];
+    //[localpool drain];
     
     priv->mCaptureSession = nil;
     priv->mCaptureDeviceInput = nil;
     priv->mCaptureDecompressedVideoOutput = nil;
+    }
 }
 
 bool CaptureQtKit::init(void)
@@ -275,7 +283,8 @@ bool CaptureQtKit::init(void)
     if (isReady() && isConnected())
         return true;
     
-    NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+    //NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
     
     dispatch_semaphore_wait(priv->mSemaphore, DISPATCH_TIME_FOREVER);
 
@@ -395,7 +404,7 @@ bool CaptureQtKit::init(void)
 
 bail:
 	dispatch_semaphore_signal(priv->mSemaphore);
-    [localpool drain];
+    //[localpool drain];
 
 	bool statehaschanged = (state != tmpstate);
 	state = tmpstate;
@@ -425,6 +434,7 @@ bail:
 			capcenter->stateChanged(this);
         cleanup();
         return false;
+    }
     }
 }
 
@@ -465,6 +475,7 @@ void CaptureQtKit::stop()
 
 bool CaptureQtKit::isConnected(void)
 {
+    @autoreleasepool {
 //    NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
     QTCaptureDevice *device = [priv->mCaptureDeviceInput device];
     bool result = [device isConnected] && ![device isInUseByAnotherApplication];
@@ -481,6 +492,7 @@ bool CaptureQtKit::isConnected(void)
         cleanup();
     }
     return result;
+    }
 }
 
 bool CaptureQtKit::isOpen(void)
@@ -517,7 +529,8 @@ void CaptureQtKit::unlock(int channel)
 void CaptureQtKit::setDesiredSize(int dWidth, int dHeight)
 {
     if (dWidth > 0 && dHeight > 0) {
-        NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+        @autoreleasepool {
+        //NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
         NSDictionary* pixelBufferOptions = [NSDictionary dictionaryWithObjectsAndKeys:
                                             [NSNumber numberWithDouble:1.0*dWidth],  (id)kCVPixelBufferWidthKey,
                                             [NSNumber numberWithDouble:1.0*dHeight], (id)kCVPixelBufferHeightKey,
@@ -525,20 +538,22 @@ void CaptureQtKit::setDesiredSize(int dWidth, int dHeight)
                                             nil];
         
         [priv->mCaptureDecompressedVideoOutput setPixelBufferAttributes:pixelBufferOptions];
-        [localpool drain];
+        //[localpool drain];
         desiredWidth = dWidth;
         desiredHeight = dHeight;
+        }
     }
 }
 
 void CaptureQtKit::setDesiredWidth(int dWidth)
 {
     if (dWidth > 0) {
+        @autoreleasepool {
 		float w = 0;
 		float h = 0;
 		int dHeight = 0;
 		
-        NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+        //NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
         NSDictionary* pixelBufferOptions = [priv->mCaptureDecompressedVideoOutput pixelBufferAttributes];	
 		if (pixelBufferOptions != nil) {
 			NSNumber *wNum = [pixelBufferOptions valueForKey:(NSString *)kCVPixelBufferWidthKey];
@@ -546,7 +561,7 @@ void CaptureQtKit::setDesiredWidth(int dWidth)
 			if (wNum != nil) w = [wNum floatValue];
 			if (hNum != nil) h = [hNum floatValue];
 		}
-		[localpool drain];
+		//[localpool drain];
 
 		if (w != 0 && h != 0) {
 			// dWidth : dHeight = w : h
@@ -555,17 +570,19 @@ void CaptureQtKit::setDesiredWidth(int dWidth)
 			dHeight = dWidth * (float) desiredHeight / desiredWidth;
 		}
 		setDesiredSize(dWidth, dHeight);
+        }
     }
 }
 
 void CaptureQtKit::setDesiredHeight(int dHeight)
 {
 	if (dHeight > 0) {
+        @autoreleasepool {
 		float w = 0;
 		float h = 0;
 		int dWidth = 0;
 		
-        NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+        //NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
         NSDictionary* pixelBufferOptions = [priv->mCaptureDecompressedVideoOutput pixelBufferAttributes];	
 		if (pixelBufferOptions != nil) {
 			NSNumber *wNum = [pixelBufferOptions valueForKey:(NSString *)kCVPixelBufferWidthKey];
@@ -573,7 +590,7 @@ void CaptureQtKit::setDesiredHeight(int dHeight)
 			if (wNum != nil) w = [wNum floatValue];
 			if (hNum != nil) h = [hNum floatValue];
 		}
-		[localpool drain];
+		//[localpool drain];
 
 		if (w != 0 && h != 0) {
 			// dWidth : dHeight = w : h
@@ -582,5 +599,6 @@ void CaptureQtKit::setDesiredHeight(int dHeight)
 			dWidth = dHeight * (float) desiredWidth / desiredHeight;
 		}
 		setDesiredSize(dWidth, dHeight);
+        }
     }
 }

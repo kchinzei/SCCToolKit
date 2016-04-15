@@ -42,6 +42,7 @@
 #import "CvChromakey.h"
 
 #include "CaptureQtKit.h"   // Debug purpose only
+#include "CaptureDeckLink.h"   // Debug purpose only
 
 #define nCameras 3
 
@@ -421,9 +422,11 @@ void Application::myMessageOutput(QtMsgType type, const QMessageLogContext &cont
 {
 	QByteArray localMsg = msg.toLocal8Bit();
     switch (type) {
+#if QT_VERSION >= 0x050000
 		case QtInfoMsg:
             std::cerr << "Info: " << localMsg.constData();
             break;
+#endif
 		case QtDebugMsg:
             std::cerr << "Debug: " << localMsg.constData();
             break;
@@ -443,9 +446,11 @@ void Application::myMessageOutput(QtMsgType type, const QMessageLogContext &cont
 void Application::myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
+#if QT_VERSION >= 0x050000
 		case QtInfoMsg:
-            std::cerr << "Info: " << localMsg.constData();
+            std::cerr << "Info: " << msg;
             break;
+#endif
         case QtDebugMsg:
             std::cerr << "Debug: " << msg;
             break;

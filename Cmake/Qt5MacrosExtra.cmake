@@ -63,13 +63,14 @@ function(QT5_WRAP_CPP outfiles )
 
     set(options)
     set(oneValueArgs TARGET)
-    set(multiValueArgs OPTIONS)
+    set(multiValueArgs OPTIONS DEPENDS)
 
     cmake_parse_arguments(_WRAP_CPP "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(moc_files ${_WRAP_CPP_UNPARSED_ARGUMENTS})
     set(moc_options ${_WRAP_CPP_OPTIONS})
     set(moc_target ${_WRAP_CPP_TARGET})
+    set(moc_depends ${_WRAP_CPP_DEPENDS})
 
     if (moc_target AND CMAKE_VERSION VERSION_LESS 2.8.12)
         message(FATAL_ERROR "The TARGET parameter to qt5_wrap_cpp is only available when using CMake 2.8.12 or later.")
@@ -82,7 +83,9 @@ function(QT5_WRAP_CPP outfiles )
 	else()
 	  qt5_make_output_file(${it} moc_ cpp outfile)
 	endif()
-        qt5_create_moc_command(${it} ${outfile} "${moc_flags}" "${moc_options}" "${moc_target}")
+	# Qt 5.6 turns qt5_create_moc_command() into a 6-arg function. Adapt to this.
+	# Works fine for < Qt 5.6, additionally passed parameters are ignored in CMake.
+        qt5_create_moc_command(${it} ${outfile} "${moc_flags}" "${moc_options}" "${moc_target}" "${moc_depends}")
         list(APPEND ${outfiles} ${outfile})
     endforeach()
     set(${outfiles} ${${outfiles}} PARENT_SCOPE)
