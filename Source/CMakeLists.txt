@@ -43,6 +43,7 @@ SET(SRC_FILES_OBJC
   CaptureDeckLink.mm
   CaptureQtKit.mm
   QCvGLWidget.mm
+  QCvOGLWidget.mm
   QCvGLWidget_private.m
 )
 
@@ -55,6 +56,7 @@ SET(SRC_FILES
 
 SET(MOC_HDRS_OBJC
   QCvGLWidget.h
+  QCvOGLWidget.h
   )
 
 SET(MOC_PUBLIC_HDRS

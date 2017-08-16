@@ -47,6 +47,7 @@ function(scc_define_option variable description value)
   endif()
 
   if(${__condition} AND NOT x${__value} STREQUAL x)
+    scc_resolve_backslash(__value)
     if("${__value}" MATCHES ";")
       if (${__value} STREQUAL ON OR ${__value} STREQUAL TRUE OR ${__value} STREQUAL YES OR
 	  ${__value} STREQUAL on OR ${__value} STREQUAL true OR ${__value} STREQUAL yes)
@@ -89,6 +90,25 @@ function(scc_clear_vars)
   endforeach()
 endfunction()
 
+# scc_resolve_backslash
+#
+# Resolve backslashes in ${variable} to properly work on path expression. It assumes 3 cases:
+#  1) set(variable "c:\\foo\\hoge")
+#  2) set(variable "c:\foo\hoge")
+#  3) set(variable "/foo/hoge\ hoge")
+# For these cases, scc_resolve_backslash(variable) will resolve
+#  1) "c:/foo/hoge"
+#  2) "c:/foo/hoge"
+#  3) "/foo/hoge hoge"
+# accordingly. It does not check valiable is valid.
+function(scc_resolve_backslash variable)
+  set(_tmpv ${${variable}})
+  string(REPLACE "\\\\" "/" _tmpv ${_tmpv})
+  string(REPLACE "\\ " " " _tmpv ${_tmpv})
+  string(REPLACE "\\" "/" _tmpv ${_tmpv})
+  set(${variable} "${_tmpv}" PARENT_SCOPE)
+endfunction()
+
 # scc_read_opencv_config
 #
 # This is used to obtain Qt information if OpenCV was build with Qt.
@@ -96,6 +116,9 @@ endfunction()
 # 
 function(scc_read_opencv_config)
   if(OpenCV_FOUND)
+    if(OpenCV_DIR)
+      scc_resolve_backslash(OpenCV_DIR)
+    endif(OpenCV_DIR)
     find_file(__OPENCV_CACHE CMakeCache.txt PATHS ${OpenCV_DIR})
     if(__OPENCV_CACHE)
       set(__Qt5Core_DIR_OLD ${Qt5Core_DIR})

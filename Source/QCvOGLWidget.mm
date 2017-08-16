@@ -6,7 +6,7 @@
  Version:   $Revision: $
  URL:       http://scc.pj.aist.go.jp
  
- (c) 2013- Kiyoyuki Chinzei, Ph.D., AIST Japan, All rights reserved.
+ (c) 2016- Kiyoyuki Chinzei, Ph.D., AIST Japan, All rights reserved.
  
  Acknowledgement: This work is/was supported by many research fundings.
  See Acknowledgement.txt
@@ -22,7 +22,7 @@
  * QGLWidget that can draw CIImage and Qt image.
  */
 
-#include "QCvGLWidget.h"
+#include "QCvOGLWidget.h"
 #include <opencv2/core/core_c.h>
 #include "opencv2/highgui/highgui.hpp"
 #include <QPainter>
@@ -34,29 +34,32 @@
 #include <cassert>
 
 
-QCvGLWidget::QCvGLWidget(QWidget* parent, const QGLWidget * shareWidget, Qt::WindowFlags f)
-: QGLWidget(parent, shareWidget, f)
+QCvOGLWidget::QCvOGLWidget(QWidget* parent, const QOpenGLWidget * shareWidget, Qt::WindowFlags f)
+: QOpenGLWidget(parent, f)
 , paintMode(Cap::kPaintModeNoScalling)
 , imageType(QCvGLWidget_Undef)
+, pOGLFunctions(nullptr)
 , image2Draw_ci(nil)
 , context(nil)
 , doClear(0)
 {
-    setContentsMargins(0, 0, 0, 0);
-    setMinimumSize(1, 1);
-    //    setAlignment(Qt::AlignHCenter);
+    // setContentsMargins(0, 0, 0, 0);
+    // setMinimumSize(1, 1);
+    // setAlignment(Qt::AlignHCenter);
     
-    setObjectName(QString::fromUtf8("QCvGLWidget"));
+    setObjectName(QString::fromUtf8("QCvOGLWidget"));
     mSemaphore = dispatch_semaphore_create(1);
     image2Draw_qt = QImage(640, 480, QImage::Format_RGB888);
 }
 
 
-QCvGLWidget::~QCvGLWidget()
+QCvOGLWidget::~QCvOGLWidget()
 {
+    /* ARC
     dispatch_release(mSemaphore);
     [(QCvGLWidget_CIImageDrower *)context release];
     context = nil;
+     */
 }
 
 
@@ -65,12 +68,12 @@ QCvGLWidget::~QCvGLWidget()
 // Handler for arrival of a new frame.
 //
 
-void QCvGLWidget::onUpdateImage(cv::Mat& arr)
+void QCvOGLWidget::onUpdateImage(cv::Mat& arr)
 {
     updateImage(arr);
 }
 
-void QCvGLWidget::onUpdateImage(CIImage *img)
+void QCvOGLWidget::onUpdateImage(CIImage *img)
 {
     updateImage(img);
 }
@@ -79,7 +82,7 @@ void QCvGLWidget::onUpdateImage(CIImage *img)
 //
 // draws a new frame.
 //
-void QCvGLWidget::updateImage(cv::Mat& arr)
+void QCvOGLWidget::updateImage(cv::Mat& arr)
 {
     QImage::Format fmt = QImage::Format_RGB888;
     if (arr.type() == CV_8UC4)
@@ -93,26 +96,28 @@ void QCvGLWidget::updateImage(cv::Mat& arr)
     update();
 }
 
-void QCvGLWidget::updateImage(CIImage *img)
+void QCvOGLWidget::updateImage(CIImage *img)
 {
     CIImage *imageToRelease = image2Draw_ci;
-    [img retain];
+    //ARC
+    //[img retain];
     dispatch_semaphore_wait(mSemaphore, DISPATCH_TIME_FOREVER);
     image2Draw_ci = img;
     imageType = QCvGLWidget_CIImage;
     dispatch_semaphore_signal(mSemaphore);
-    [imageToRelease release];
+    //ARC
+    //[imageToRelease release];
     
-    updateGL();
+    update();
 }
 
-void QCvGLWidget::clear(void)
+void QCvOGLWidget::clear(void)
 {
     doClear = 2;    // Need to clear double buffer.
     update();
 }
 
-void QCvGLWidget::onClear(void)
+void QCvOGLWidget::onClear(void)
 {
     clear();
 }
@@ -120,39 +125,41 @@ void QCvGLWidget::onClear(void)
 /*
  QGLWidget requires overriding three functions.
  */
-void QCvGLWidget::initializeGL(void)
+void QCvOGLWidget::initializeGL(void)
 {
+    pOGLFunctions = QOpenGLContext::currentContext()->functions();
+    
     // Set up the rendering context, define display lists etc.:
     int w = this->width();
     int h = this->height();
-    glViewport (0, 0, w, h);
+    pOGLFunctions->glViewport (0, 0, w, h);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     glOrtho (0, w, 0, h, -1, 1);
-    glClear(GL_COLOR_BUFFER_BIT	 | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_BLEND);
+    pOGLFunctions->glClear(GL_COLOR_BUFFER_BIT	 | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    pOGLFunctions->glClearColor(0.0, 0.0, 0.0, 0.0);
+    pOGLFunctions->glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    pOGLFunctions->glEnable (GL_BLEND);
     context = [[QCvGLWidget_CIImageDrower alloc] init];
 }
 
-void QCvGLWidget::resizeGL(int w, int h)
+void QCvOGLWidget::resizeGL(int w, int h)
 {
     // setup viewport, projection etc.:
-    //glMatrixMode (GL_PROJECTION);
-    glViewport (0, 0, w, h);
+    // pOGLFunctions->glMatrixMode (GL_PROJECTION);
+    pOGLFunctions->glViewport (0, 0, w, h);
     glLoadIdentity ();
     glOrtho (0, w, 0, h, -1, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
-    //glClear(GL_COLOR_BUFFER_BIT	 | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //glFrustum(...);
+    pOGLFunctions->glClear(GL_COLOR_BUFFER_BIT);
+    // pOGLFunctions->glClear(GL_COLOR_BUFFER_BIT	 | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    // pOGLFunctions->glFrustum(...);
 }
 
-void QCvGLWidget::paintGL(void)
+void QCvOGLWidget::paintGL(void)
 {
     assert(context != nil);
     GLfloat pSize = 0;
-    glGetFloatv(GL_POINT_SIZE, &pSize);
+    pOGLFunctions->glGetFloatv(GL_POINT_SIZE, &pSize);
     
     int w = this->width();
     int h = this->height();
@@ -160,11 +167,13 @@ void QCvGLWidget::paintGL(void)
     dispatch_semaphore_wait(mSemaphore, DISPATCH_TIME_FOREVER);
     if (doClear > 0) {
         //std::cerr << "glClear " << doClear << std::endl;
-        glClear(GL_COLOR_BUFFER_BIT);
+        pOGLFunctions->glClear(GL_COLOR_BUFFER_BIT);
         doClear--;
     } else {
         if (image2Draw_ci) {
-            QCvGLWidget_CIImageDrower *c = (QCvGLWidget_CIImageDrower *)context;
+            // ARC
+            // QCvGLWidget_CIImageDrower *c = (QCvGLWidget_CIImageDrower *)context;
+            QCvGLWidget_CIImageDrower *c = (__bridge QCvGLWidget_CIImageDrower *)context;
             switch (paintMode) {
                 case Cap::kPaintModeNoScalling:
                     [c drawImageWithoutScaling:image2Draw_ci
@@ -192,45 +201,48 @@ void QCvGLWidget::paintGL(void)
     dispatch_semaphore_signal(mSemaphore);
 }
 
-void QCvGLWidget::resizeEvent (QResizeEvent * event)
+void QCvOGLWidget::resizeEvent (QResizeEvent * event)
 {
     QPainter myPainter;
     myPainter.eraseRect(this->rect());
-    QGLWidget::resizeEvent(event);
+    QOpenGLWidget::resizeEvent(event);
 }
 
-void QCvGLWidget::paintEvent(QPaintEvent* event)
+void QCvOGLWidget::paintEvent(QPaintEvent* event)
 {
-    // Call base class handler to draw the bounding box of this frame.
-    QPainter myPainter(this);
-    //myPainter.setWorldTransform(param_matrixWorld);
-    myPainter.setBackgroundMode(Qt::OpaqueMode);
-    
-    dispatch_semaphore_wait(mSemaphore, DISPATCH_TIME_FOREVER);
-    if (doClear > 0) {
-        //std::cerr << "eraseRect " << doClear << std::endl;
-        myPainter.eraseRect(this->rect());
-        doClear--;
-    } else {
-        switch (paintMode) {
-            case Cap::kPaintModeNoScalling:
-                draw2DWithoutScaling(&myPainter);
-                break;
-            case Cap::kPaintModeScaleToFill:
-                draw2DWithScaleToFill(&myPainter);
-                break;
-            case Cap::kPaintModeScaleAspectFit:
-                draw2DWithScaleAspectFit(&myPainter);
-                break;
-            case Cap::kPaintModeScaleAspectFill:
-                draw2DWithScaleAspectFill(&myPainter);
-                break;
+    if (imageType == QCvGLWidget_QImage) {
+        // Call base class handler to draw the bounding box of this frame.
+        QPainter myPainter(this);
+        //myPainter.setWorldTransform(param_matrixWorld);
+        myPainter.setBackgroundMode(Qt::OpaqueMode);
+        
+        dispatch_semaphore_wait(mSemaphore, DISPATCH_TIME_FOREVER);
+        if (doClear > 0) {
+            //std::cerr << "eraseRect " << doClear << std::endl;
+            myPainter.eraseRect(this->rect());
+            doClear--;
+        } else {
+            switch (paintMode) {
+                case Cap::kPaintModeNoScalling:
+                    draw2DWithoutScaling(&myPainter);
+                    break;
+                case Cap::kPaintModeScaleToFill:
+                    draw2DWithScaleToFill(&myPainter);
+                    break;
+                case Cap::kPaintModeScaleAspectFit:
+                    draw2DWithScaleAspectFit(&myPainter);
+                    break;
+                case Cap::kPaintModeScaleAspectFill:
+                    draw2DWithScaleAspectFill(&myPainter);
+                    break;
+            }
         }
+        dispatch_semaphore_signal(mSemaphore);
     }
-    dispatch_semaphore_signal(mSemaphore);
+    QOpenGLWidget::paintEvent(event);
 }
 
-void QCvGLWidget::draw2DWithScaleToFill(QPainter *painter)
+void QCvOGLWidget::draw2DWithScaleToFill(QPainter *painter)
 {
     // Always draw image2Draw_qt at the center of me.
     QRect target = painter->viewport();
@@ -238,7 +250,7 @@ void QCvGLWidget::draw2DWithScaleToFill(QPainter *painter)
     painter->drawImage (target, image2Draw_qt, source);
 }
 
-void QCvGLWidget::draw2DWithoutScaling(QPainter *painter)
+void QCvOGLWidget::draw2DWithoutScaling(QPainter *painter)
 {
     // Always draw image2Draw_qt at the center of me.
     QRect target, source;
@@ -273,7 +285,7 @@ void QCvGLWidget::draw2DWithoutScaling(QPainter *painter)
     painter->drawImage (target, image2Draw_qt, source);
 }
 
-void QCvGLWidget::draw2DWithScaleAspectFit(QPainter *painter)
+void QCvOGLWidget::draw2DWithScaleAspectFit(QPainter *painter)
 {
     // Always draw image2Draw_qt at the center of me.
     QRect destRect = painter->viewport();
@@ -294,7 +306,7 @@ void QCvGLWidget::draw2DWithScaleAspectFit(QPainter *painter)
     painter->drawImage (destRect, image2Draw_qt, imgRect);
 }
 
-void QCvGLWidget::draw2DWithScaleAspectFill(QPainter *painter)
+void QCvOGLWidget::draw2DWithScaleAspectFill(QPainter *painter)
 {
     // Always draw image2Draw_qt at the center of me.
     QRect destRect = painter->viewport();
@@ -317,7 +329,7 @@ void QCvGLWidget::draw2DWithScaleAspectFill(QPainter *painter)
 
 
 /*
- QSize QCvGLWidget::sizeHint() const
+ QSize QCvOGLWidget::sizeHint() const
  {
 	return QGLWidget::sizeHint();
  }

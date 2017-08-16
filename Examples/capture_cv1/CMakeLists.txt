@@ -19,5 +19,5 @@
 
 set(APP "capture_cv1")
 
-ADD_EXECUTABLE(${APP} main.c)
+ADD_EXECUTABLE(${APP} main.cpp)
 TARGET_LINK_LIBRARIES(${APP} ${SCC_TARGET_LIBS})

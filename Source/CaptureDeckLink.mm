@@ -74,8 +74,10 @@ CaptureDeckLink::CaptureDeckLink()
     mDisplayModeName[0] = '\0';
     mImageL = cv::Mat(desiredHeight, desiredWidth, CV_8UC4);
     mImageR = cv::Mat(desiredHeight, desiredWidth, CV_8UC4);
-    mCIImageL = makeCIImageFromMat(&mImageL, &mBitmapRepL);
-    mCIImageR = makeCIImageFromMat(&mImageR, &mBitmapRepR);
+    // ARC
+    NSBitmapImageRep *tmpRep = nil;
+    mCIImageL = makeCIImageFromMat(&mImageL, &tmpRep); mBitmapRepL = tmpRep;
+    mCIImageR = makeCIImageFromMat(&mImageR, &tmpRep); mBitmapRepR = tmpRep;
     mFilterQ = dispatch_queue_create("jp.go.aist.filterQ.left", DISPATCH_QUEUE_SERIAL);
     dispatch_sync(mFilterQ, ^{
         mCMatrix = [CIFilter filterWithName:@"CIColorMatrix"
@@ -95,6 +97,7 @@ CaptureDeckLink::~CaptureDeckLink()
     cleanup();
 	if (deckLinkIterator != nullptr)
 		deckLinkIterator->Release();
+    // ARC
     dispatch_release(mSemaphore_imgL);
     dispatch_release(mSemaphore_imgR);
     dispatch_release(mSemaphore_init);
@@ -293,8 +296,8 @@ static void initMatWithVideoFrame(cv::Mat *image, const CustomDeckLinkVideoFrame
 
 static void initCIImageWithMat(CIImage *img, const cv::Mat* mat, NSBitmapImageRep *bitmapRep)
 {
-    @autoreleasepool {
-    //NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    //@autoreleasepool {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 /*
     CGSize siz = CGSizeMake(mat->cols, mat->rows);
     NSData *d = [NSData dataWithBytesNoCopy:const_cast<cv::Mat *>(mat)->ptr() length:mat->step*mat->rows*mat->elemSize() freeWhenDone:NO];
@@ -329,8 +332,8 @@ static void initCIImageWithMat(CIImage *img, const cv::Mat* mat, NSBitmapImageRe
                             bytesPerRow:mat->step
                            bitsPerPixel:bitsPerSample*samplesPerPixel];
     [img initWithBitmapImageRep:bitmapRep];
-    //[pool drain];
-    }
+    [pool drain];
+    //}
 }
 
 static CIImage * makeCIImageFromMat(const cv::Mat* mat, NSBitmapImageRep **bitmapRep)

@@ -10,11 +10,11 @@ The root directory, SCCToolKit, can be placed at any place where convenient for 
 
 Prerequisite
 --------------
-Currently, SCCToolKit is supported only on Mac OSX 10.7 or higher.
+Currently, SCCToolKit is supported only on Mac OSX 10.7 or higher. [MaxOS 10.12 has issues now].
 (We plan to extend to Windows.)
 In addition, you need the followings being installed.
 - XCode.app from apple.com
-- Qt 4.7 or 4.8. We have not tested on Qt 5. (But will support it).
+- Qt 4.8.7 or Qt 5.6 (long term support). We tested on Qt 5.8.
 - OpenCV 2.4 or higher. You may need to build it before you build SCCToolKit.
 - Blackmagic Design's Decklink SDK. We tested on 9.6.9 or later, but should work from 9.0. (This SDK is necessary to link everything. But you can run the most of examples without the Decklink hardware.)
 

@@ -34,6 +34,8 @@
 #include "CaptureCenter.h"
 #include "Capture.h"
 #include "CaptureUtils.h"
+#include "CaptureQtKit.h"
+#include "CaptureDeckLink.h"
 
 #include <dispatch/dispatch.h>
 
@@ -51,6 +53,7 @@ static void usage(const char *progname)
 			"%s [-options]\n"
             "   [-w width]    default=%lf\n"
             "   [-h height]   default=%lf\n"
+            "   [-u] Use internal cameras. default=false\n"
             "   [-f FPS]      default=%lf\n", progname, w, h, f
             );
 }
@@ -107,9 +110,10 @@ int main (int argc, char **argv)
     else
 		progname = argv[0];
     
+    bool useInternalCameras = false;
     int ch;
     opterr = 0;
-    while ((ch = getopt(argc, argv, "?h:w:f:")) != -1) {
+    while ((ch = getopt(argc, argv, "?h:w:f:u")) != -1) {
         switch (ch) {
             case 'h':
                 h = atoi(optarg);
@@ -119,6 +123,9 @@ int main (int argc, char **argv)
                 break;
             case 'f':
                 f = atoi(optarg);
+                break;
+            case 'u':
+                useInternalCameras = true;
                 break;
             default:
                 usage(progname);
@@ -137,13 +144,12 @@ int main (int argc, char **argv)
     
     for (int i=0; i<2; i++) {
         Capture *cap;
-        if (i == 0)
+        if (i == 0) {
             cap = capcenter.addCapture(kCaptureTypeDeckLink);
-        else
+        } else {
             cap = capcenter.addCapture(kCaptureTypeQtKit);
-        if (cap == nullptr) {
-            std::cerr << "Fail to create capture #" << i << std::endl;
-            return -1-i;
+            CaptureQtKit *cqk = (CaptureQtKit *)cap;
+            cqk->mUseInternalCameras = useInternalCameras;
         }
         if (cap->init() == false) {
             std::cerr << "Fail to open capture #" << i << std::endl;
