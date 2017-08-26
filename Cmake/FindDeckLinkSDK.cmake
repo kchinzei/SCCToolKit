@@ -1,10 +1,9 @@
-# - Find DeckLink SDK includes.
 # This module finds where the DeckLink SDK include file is installed.
 # DeckLink SDK is the toolkit for BlackMagickDesign Capture hardware.
 # Visit www.blackmagic-design.com/support
 #
 # This code sets the following variables:
-#  DeckLinkSDK_FOUND    = DeckLinkSDK was found
+#  DeckLinkSDK_FOUND    = DeckLinkSDK is found
 #  DeckLinkSDK_PATH     = where DeckLinkSDK is. Cashed
 #  DeckLinkSDK_INCLUDE_PATH = path to where ${DeckLinkSDK_INCLUDE_FILE} is found
 #  DeckLinkSDK_INCLUDE_FILE = DeckLinkAPI.idl (Win) or DeckLinkAPI.h (Mac/Linux)
@@ -31,7 +30,7 @@
 #
 # You can optionally provide version argument, for example;
 #    FIND_PACKAGE(DeckLinkSDK 10.5 REQUIRED)
-# will ensure the version of the SDK is greater than 10.0 (e.g., 10.4.99 will produce an error.)
+# will ensure the version of the SDK is greater than or equal to 10.5 (e.g., 10.4.99 will produce an error.)
 
 #=============================================================================
 # (c) Kiyoyuki Chinzei, AIST japan.
