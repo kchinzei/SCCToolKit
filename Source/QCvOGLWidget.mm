@@ -100,13 +100,14 @@ void QCvOGLWidget::updateImage(CIImage *img)
 {
     CIImage *imageToRelease = image2Draw_ci;
     //ARC
-    //[img retain];
+    // KChinzei 20180825: Commenting out [img retain] and [imageToRelase release] causes crash as sometimes image2Draw is overwrote, resulting the previous contents is released by ARC.
+    [img retain];
     dispatch_semaphore_wait(mSemaphore, DISPATCH_TIME_FOREVER);
     image2Draw_ci = img;
     imageType = QCvGLWidget_CIImage;
     dispatch_semaphore_signal(mSemaphore);
     //ARC
-    //[imageToRelease release];
+    [imageToRelease release];
     
     update();
 }

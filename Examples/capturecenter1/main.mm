@@ -54,7 +54,7 @@ int main (int argc, char **argv)
     window.show();
 
     myCaptureCenter capcenter;
-	capcenter.addCapture(Cap::kCaptureTypeQtKit);
+	capcenter.addCapture(Cap::kCaptureTypeDeckLink);
     capcenter.start();
 	app.exec();
     capcenter.stop();
